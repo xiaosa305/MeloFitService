@@ -3,7 +3,7 @@
 <mapper namespace="com.melosound.fit.mapper.MeloUserMapper">
 	<select id="countUsers" parameterType="java.util.Map">
 		SELECT COUNT(*)
-		FORM melo_user
+		FROM melo_user
 		<where>
 			<trim prefix="AND" prefixOverrides="AND">
 				<if test="null != role">
@@ -24,7 +24,7 @@
 	
 	<select id="queryUser" parameterType="java.util.Map" resultType="MeloUser">
 		SELECT id,username,password,supervisor_id,role,name,address,phone,email,create_time,modify_time
-		FORM melo_user
+		FROM melo_user
 		<where>
 			<trim prefix="AND" prefixOverrides="AND">
 				<if test="null != role">
@@ -53,13 +53,13 @@
 	
 	<select id="findUserById" parameterType="String" resultType="MeloUser">
 		SELECT id,username,password,supervisor_id,role,name,address,phone,email,create_time,modify_time
-		FORM melo_user
+		FROM melo_user
 		WHERE id = #{id}
 	</select>
 	
 	<select id="findUserByUsername" parameterType="String" resultType="MeloUser">
 		SELECT id,username,password,supervisor_id,role,name,address,phone,email,create_time,modify_time
-		FORM melo_user
+		FROM melo_user
 		WHERE username = #{username}
 	</select>
 	

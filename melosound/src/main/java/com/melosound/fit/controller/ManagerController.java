@@ -47,9 +47,6 @@ public class ManagerController {
 	private MeloUserOperateLogService logService;
 	
 	@Autowired
-	private JwtUtils jwtUtil;
-	
-	@Autowired
 	private AESEncryptionUtils aesUtil;
 	
 	@Autowired

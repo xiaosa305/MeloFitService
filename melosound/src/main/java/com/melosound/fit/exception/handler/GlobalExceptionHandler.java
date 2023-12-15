@@ -32,7 +32,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		printException(e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(JSONUtil.toJsonStr(new ApiResponseBuilder()
 				.withCode(ResponseCode.BAD_REQUEST.getCode())
-				.withMessage(e.getMessage())
+				.withMessage("用户信息错误")
 				.build()));
     }
 	
@@ -50,7 +50,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		printException(e);
 		return new ApiResponseBuilder()
 				.withCode(ResponseCode.SERVER_ERROR.getCode())
-				.withMessage(e.getMessage())
+				.withMessage("请求错误")
 				.build();
 	}
 	

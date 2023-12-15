@@ -73,11 +73,12 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 		logger.info("meloUserLogin: username({})",username);
 		MeloUser user = userMapper.findUserByUsername(username);
 		if(ObjectUtil.isNotNull(user) && user.getPassword().equals(passwordEncoder.encode(password))) {
-			logMapper.addLog(new MeloUserOperateLog.Builder()
-					.setOperatorId(user.getId())
-					.setOperateType(OperateType.LOGIN)
-					.setOperateResult(OperateResult.SUCCESS)
-					.build());
+			MeloUserOperateLog log = new MeloUserOperateLog.Builder()
+			.setOperatorId(user.getId())
+			.setOperateType(OperateType.LOGIN)
+			.setOperateResult(OperateResult.SUCCESS)
+			.build();
+			logMapper.addLog(log);
 			return new Ret.Builder().setData(user).Success();
 		}
 		return new Ret.Builder().setMsg("账号或密码错误").Failure();

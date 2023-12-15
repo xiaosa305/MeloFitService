@@ -26,7 +26,6 @@ import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 	private final int redisKeyExpireTIme = 30;

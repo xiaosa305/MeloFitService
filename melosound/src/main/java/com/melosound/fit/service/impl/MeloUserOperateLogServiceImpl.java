@@ -32,6 +32,9 @@ public class MeloUserOperateLogServiceImpl implements MeloUserOperateLogService 
 				.setOperateResult(result)
 				.setfailureReson(failureReson)
 				.build();
+		if(ObjectUtil.isNull(log)) {
+			return new Ret.Builder().setMsg("服务器异常").Failure();
+		}
 		if(logMapper.addLog(log) > 0) {
 			return new Ret.Builder().setData(log).Success();
 		}

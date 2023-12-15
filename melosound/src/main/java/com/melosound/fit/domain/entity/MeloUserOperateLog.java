@@ -45,16 +45,15 @@ public class MeloUserOperateLog {
 			return this;
 		}
 		public MeloUserOperateLog build() {
-			Date now = new Date();
 			MeloUserOperateLog log = new MeloUserOperateLog();
 			log.setOperatorId(this.operatorId);
 			log.setTargetId(this.targetId);
 			log.setOperateType(this.operateType.getType());
 			log.setOperateResult(this.operateResult.getResult());
 			log.setFailureReson(this.failureReson);
-			log.setCreateTime(now);
+			log.setCreateTime(new Date());
 			log.setDeleted(false);
-			if(StringUtil.isNullOrEmpty(log.operatorId) || StringUtil.isNullOrEmpty(targetId)) {
+			if(StringUtil.isNullOrEmpty(log.operatorId) && StringUtil.isNullOrEmpty(targetId)) {
 				return null;
 			}
 			return log;

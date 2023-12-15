@@ -83,18 +83,4 @@ public class PublicController {
 		logger.info("loginAdministrator API");
 		return null;
 	}
-
-	@PostMapping("refresh-token")
-	public ApiResponse refreshToken(@RequestBody String requestBodyStr) {
-		logger.info("refreshToken API");
-		if(!StringUtil.isNullOrEmpty(requestBodyStr)) {
-			requestBodyStr = aesUtil.decrypt(requestBodyStr);
-			if(jwtUtil.validaterefreshToken(requestBodyStr)) {
-				
-			}
-		}
-		return null;
-	}
-
-	
 }
