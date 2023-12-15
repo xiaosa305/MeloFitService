@@ -96,41 +96,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 		filterChain.doFilter(servletRequest, servletResponse);
 		
-		String token = request.getHeader(jwtUtil.getAccessTokenHeader());
-		if (StrUtil.isNotEmpty(token)) {
-			String fitAuthorizationCode = request.getHeader("FitAuthorizationCode");
-			if (StrUtil.isNotEmpty(token) && jwtUtil.validateAccessToken(token)) {
-				username = jwtUtil.getSubjectFromAccessToken(token);
-				if (StrUtil.isNotEmpty(username)) {
-					CustomUser user = userService.loadUserByUsername(username);
-					if (Objects.nonNull(user)) {
-						UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-								user, null, user.getAuthorities());
-						authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-						if (StrUtil.isNotEmpty(fitAuthorizationCode)) {
-							try {
-								redisTemplate.opsForValue().set(keyUtil.getfitAuthorizationCodeKey(username), fitAuthorizationCode);
-								//24小时后自动删除
-								redisTemplate.expire(keyUtil.getfitAuthorizationCodeKey(username), 24,TimeUnit.HOURS);
-							} catch (Exception e) {
-								logger.error("redis save username-authorizationCode key value error: {}",
-										e.getMessage());
-								servletResponse.getWriter().write(JSONUtil.toJsonStr(new ApiResponseBuilder()
-										.withCode(ResponseCode.SERVER_ERROR.getCode()).withMessage("服务器缓存异常，认证失败").withData(request).build()));
-								return;
-							}
-						}
-						String key = keyUtil.getUserSessionKey(request.getSession().getId());
-						redisTemplate.opsForValue().set(key, user.getMeloUser().getId());
-						redisTemplate.expire(key, redisKeyExpireTIme,redisKeyExpireTimeUnit);
-						SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-						filterChain.doFilter(servletRequest, servletResponse);
-						return;
-					}
-				}
-			}
-		}
-		filterChain.doFilter(servletRequest, servletResponse);
+//		String token = request.getHeader(jwtUtil.getAccessTokenHeader());
+//		if (StrUtil.isNotEmpty(token)) {
+//			String fitAuthorizationCode = request.getHeader("FitAuthorizationCode");
+//			if (StrUtil.isNotEmpty(token) && jwtUtil.validateAccessToken(token)) {
+//				username = jwtUtil.getSubjectFromAccessToken(token);
+//				if (StrUtil.isNotEmpty(username)) {
+//					CustomUser user = userService.loadUserByUsername(username);
+//					if (Objects.nonNull(user)) {
+//						UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+//								user, null, user.getAuthorities());
+//						authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//						if (StrUtil.isNotEmpty(fitAuthorizationCode)) {
+//							try {
+//								redisTemplate.opsForValue().set(keyUtil.getfitAuthorizationCodeKey(username), fitAuthorizationCode);
+//								//24小时后自动删除
+//								redisTemplate.expire(keyUtil.getfitAuthorizationCodeKey(username), 24,TimeUnit.HOURS);
+//							} catch (Exception e) {
+//								logger.error("redis save username-authorizationCode key value error: {}",
+//										e.getMessage());
+//								servletResponse.getWriter().write(JSONUtil.toJsonStr(new ApiResponseBuilder()
+//										.withCode(ResponseCode.SERVER_ERROR.getCode()).withMessage("服务器缓存异常，认证失败").withData(request).build()));
+//								return;
+//							}
+//						}
+//						String key = keyUtil.getUserSessionKey(request.getSession().getId());
+//						redisTemplate.opsForValue().set(key, user.getMeloUser().getId());
+//						redisTemplate.expire(key, redisKeyExpireTIme,redisKeyExpireTimeUnit);
+//						SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+//						filterChain.doFilter(servletRequest, servletResponse);
+//						return;
+//					}
+//				}
+//			}
+//		}
+//		filterChain.doFilter(servletRequest, servletResponse);
 //		servletResponse.setCharacterEncoding("UTF-8");
 //		servletResponse.getWriter().write(JSONUtil.toJsonStr(new ApiResponseBuilder()
 //				.withCode(ResponseCode.SUCCESS.getCode()).withMessage("TestCompleted测试成功").withData(request).build()));
