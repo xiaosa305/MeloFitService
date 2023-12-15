@@ -63,7 +63,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		} else {
             logger.warn("JWT Token does not begin with Bearer String");
         }
-		
 		if(!StringUtil.isNullOrEmpty(username) && ObjectUtil.isNull(SecurityContextHolder.getContext().getAuthentication())) {
 			CustomUser userDetails = userService.loadUserByUsername(username);
 			if(ObjectUtil.isNotNull(userDetails) && jwtUtil.validateAccessToken(jwtToken)) {
@@ -71,18 +70,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 						userDetails, null, userDetails.getAuthorities());
 				authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				String fitAuthorizationCode = request.getHeader("FitAuthorizationCode");
+				String key = keyUtil.getfitAuthorizationCodeKey(username);
 				if(!StringUtil.isNullOrEmpty(fitAuthorizationCode)) {
-					redisTemplate.opsForValue().set(keyUtil.getfitAuthorizationCodeKey(username), fitAuthorizationCode);
+					redisTemplate.opsForValue().set(key, fitAuthorizationCode);
 					redisTemplate.expire(keyUtil.getfitAuthorizationCodeKey(username), 24,TimeUnit.HOURS);
 				}
-				String key = keyUtil.getUserSessionKey(request.getSession().getId());
+				key = keyUtil.getUserSessionKey(request.getSession().getId());
 				redisTemplate.opsForValue().set(key, userDetails.getMeloUser().getId());
 				redisTemplate.expire(key, redisKeyExpireTIme,redisKeyExpireTimeUnit);
-				
-				
 				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 			}
-			
 		}
 		filterChain.doFilter(servletRequest, servletResponse);
 	}
