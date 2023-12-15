@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.melosound.fit.mapper.MeloUserMapper">
+	<select id="countUsers" parameterType="java.util.Map">
+		SELECT COUNT(*)
+		FORM melo_user
+		<where>
+			<trim prefix="AND" prefixOverrides="AND">
+				<if test="null != role">
+					role = #{role}
+				</if>
+				<if test="null != supervisorId">
+					supervisor_id = #{supervisorId}
+				</if>
+				<if test="null != startCreateDate">
+					<![CDATA[create_time >= #{startCreateDate}]]>					
+				</if>
+				<if test="null != endCreateDate">
+					<![CDATA[create_time <= #{endCreateDate}]]>
+				</if>
+			</trim>
+		</where>
+	</select>
+	
+	<select id="queryUser" parameterType="java.util.Map" resultType="MeloUser">
+		SELECT id,username,password,supervisor_id,role,name,address,phone,email,create_time,modify_time
+		FORM melo_user
+		<where>
+			<trim prefix="AND" prefixOverrides="AND">
+				<if test="null != role">
+					role = #{role}
+				</if>
+				<if test="null != supervisorId">
+					supervisor_id = #{supervisorId}
+				</if>
+				<if test="null != startCreateDate">
+					<![CDATA[create_time >= #{startCreateDate}]]>					
+				</if>
+				<if test="null != endCreateDate">
+					<![CDATA[create_time <= #{endCreateDate}]]>
+				</if>
+			</trim>
+		</where>
+		<where>
+			<if test="null != orderBy">
+				ORDER BY ${orderBy}
+			</if>
+			<if test="pageSize != null and null != offset">
+				LIMIT #{pageSize} OFFSET #{offset}
+			</if>
+		</where>
+	</select>
+	
+	<select id="findUserById" parameterType="String" resultType="MeloUser">
+		SELECT id,username,password,supervisor_id,role,name,address,phone,email,create_time,modify_time
+		FORM melo_user
+		WHERE id = #{id}
+	</select>
+	
+	<select id="findUserByUsername" parameterType="String" resultType="MeloUser">
+		SELECT id,username,password,supervisor_id,role,name,address,phone,email,create_time,modify_time
+		FORM melo_user
+		WHERE username = #{username}
+	</select>
+	
+	<insert id="addUser" parameterType="MeloUser">
+		INSERT INTO melo_user(id,username,password,supervisor_id,role,name,address,phone,email,create_time,,modify_time)
+		VALUES (#{id},#{username},#{password},#{supervisorId},#{role},#{name},#{address},#{phone},#{email},#{createTime},#{modifyTime})
+	</insert>
+	
+	<delete id="deleteUser" parameterType="String">
+		DELETE FROM melo_user
+		WHERE id = #{id}
+	</delete>
+	
+	<update id="updateUser" parameterType="MeloUser">
+		UPDATE melo_user_base
+		SET password = #{password},name = #{name},address = #{address},phone = #{phone},email = #{email},modify_time = #{modifyTime}
+		WHERE id = #{id}
+	</update>
+</mapper>

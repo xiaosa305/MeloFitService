@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.melosound.fit.mapper.MeloUserOperateLogMapper">
+	<select id="countLogs" parameterType="java.util.Map">
+		SELECT COUNT(*)
+		FROM melo_user_operate_log
+		<where>
+			<trim prefix="AND" prefixOverrides="AND">
+				<if test="1">
+					deleted = '0'
+				</if>
+				<if test="null != operatorId">
+					operator_id = #{operatorId}
+				</if>
+				<if test="null != targetId">
+					target_id = #{targetId}
+				</if>
+				<if test="null != startCreateDate">
+					<![CDATA[create_time >= #{startCreateDate}]]>
+				</if>
+				<if test="null != endCreateDate">
+					<![CDATA[create_time <= #{EndCreateDate}]]>
+				</if>
+				<if test="null != operateType">
+					operate_type = #{operateType}
+				</if>
+				<if test="null != operateResult">
+					operate_result = #{operateResult}
+				</if>
+			</trim>
+		</where>
+	</select>
+
+	<select id="MeloUserOperateLog" parameterType="java.util.Map" resultType="MeloUserOperateLog">
+		SELECT id,operator_id,target_id,create_time,operate_type,operate_result,failure_reson
+		FROM melo_user_operate_log
+		<where>
+			<trim prefix="AND" prefixOverrides="AND">
+				<if test="1">
+					deleted = '0'
+				</if>
+				<if test="null != operatorId">
+					operator_id = #{operatorId}
+				</if>
+				<if test="null != targetId">
+					target_id = #{targetId}
+				</if>
+				<if test="null != startCreateDate">
+					<![CDATA[create_time >= #{startCreateDate}]]>
+				</if>
+				<if test="null != endCreateDate">
+					<![CDATA[create_time <= #{EndCreateDate}]]>
+				</if>
+				<if test="null != operateType">
+					operate_type = #{operateType}
+				</if>
+				<if test="null != operateResult">
+					operate_result = #{operateResult}
+				</if>
+			</trim>
+		</where>
+		<if test="orderBy != null">
+    		ORDER BY ${orderBy}
+  		</if>
+  		<if test="pageSize != null and offset != null">
+    		LIMIT #{pageSize} OFFSET #{offset}
+  		</if>
+	</select>
+	
+	<select id="findLog" parameterType="long" resultType="MeloUserOperateLog">
+		SELECT id,operator_id,target_id,create_time,operate_type,operate_result,failure_reson
+		FROM melo_user_operate_log
+		WHERE id = #{id} AND deleted = '0'
+	</select>
+	
+	<insert id="addLog" parameterType="MeloUserOperateLog">
+		INSERT INTO melo_user_operate_log(operator_id,target_id,create_time,operate_type,operate_result,failure_reson,deleted)
+		VALUES (#{operatorId},#{targetId},#{createTime},#{operateType},#{operateResult},#{failureReson},#{deleted})
+	</insert>
+	
+	<delete id="deleteLog" parameterType="long">
+		DELETE FROM melo_user_operate_log
+		WHERE id = #{id}	
+	</delete>
+</mapper>

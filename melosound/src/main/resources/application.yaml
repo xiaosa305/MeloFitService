@@ -1,0 +1,70 @@
+server:
+   port: 8080
+   servlet:
+      encoding:
+         charset: UTF-8
+         force: true
+logging:
+  level:
+    com.melosound.fitserver: DEBUG
+    org.springframework: INFO
+spring:
+   http:
+      encoding:
+         charset: UTF-8
+         force: true
+   jackson:
+      date-format: yyyy-MM-dd HH:mm:ss
+      time-zone: GMT+8
+   datasource:
+      url: jdbc:mysql://192.168.174.129:3306/melofitting?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+      #username: root
+      #password: a465492278@Mysql
+      username: xiaosa
+      password: 123456
+      driverClassName: com.mysql.cj.jdbc.Driver
+   rabbitmq:
+      host: 192.168.174.129
+      #127.0.0.1
+      port: 5672
+      #注意：guest用户只能链接本地服务器 比如localhost  不可以连接远程服务器
+      username: xiaosa
+      password: 123456
+      virtual-host: /
+      publisher-returns: true
+      listener:
+      # guest
+      # Routing 路由模型（交换机类型：direct）
+         direct:
+            #消息确认：手动签收
+            acknowledge-mode: manual
+            #当前监听容器数
+            concurrency: 1
+            #最大数
+            max-concurrency: 10
+            retry:
+               enabled: true
+               #重试次数5,超过5次抛出异常
+               max-attempts: 5
+               #重试间隔 3s
+               max-interval: 3000
+   redis:
+      #host: 127.0.0.1
+      host: 192.168.174.129
+      port: 6379
+      #password: a465492278
+      password: 123456
+mybatis:
+  mapper-locations: classpath:mappers/*.xml # 映射文件位置
+  type-aliases-package: com.melosound.fit.domain.entity # 实体类存放位置
+  configuration:
+    map-underscore-to-camel-case: true # 开启驼峰命名转换
+jwt:
+   accessSecret: MeloSound-Fit-Server-AccessKey@2023-08-17
+   refreshSecret: MeloSound-Fit-Server-RefreshKey@2023-08-17
+   accessTokenExpiration: 86400 # 访问令牌过期时间（以秒为单位）300s
+   refreshTokenExpiration: 604800 # 刷新令牌过期时间（以秒为单位）7d
+   tokenHead: Authorization
+
+
+   

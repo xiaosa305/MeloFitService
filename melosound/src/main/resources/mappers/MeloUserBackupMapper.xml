@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.melosound.fit.mapper.MeloUserBackupMapper">
+	<select id="countUsers" parameterType="java.util.Map">
+		SELECT COUNT(*)
+		FORM melo_user_backup
+		<where>
+			<trim prefix="AND" prefixOverrides="AND">
+				<if test="null != uuid">
+					uuid = #{uuid}
+				</if>
+				<if test="null != role">
+					role = #{role}
+				</if>
+				<if test="null != supervisorId">
+					supervisor_id = #{supervisorId}
+				</if>
+				<if test="null != deletedUserId">
+					deleted_user_id = #{deletedUserId}
+				</if>
+				<if test="null != startCreateDate">
+					<![CDATA[create_time >= #{startCreateDate}]]>					
+				</if>
+				<if test="null != endCreateDate">
+					<![CDATA[create_time <= #{endCreateDate}]]>
+				</if>
+				<if test="null != startDeletedDate">
+					<![CDATA[deleted_time >= #{startDeletedDate}]]>					
+				</if>
+				<if test="null != endDeletedDate">
+					<![CDATA[deleted_time <= #{endDeletedDate}]]>
+				</if>
+			</trim>
+		</where>
+	</select>
+	
+	<select id="queryMeloUserBackups" parameterType="java.util.Map" resultType="MeloUserBackup">
+		SELECT id,uuid,username,supervisor_id,role,name,address,phone,email,create_time,modify_time,deleted_time,deleted_user_id
+		FORM melo_user_backup
+		<where>
+			<trim prefix="AND" prefixOverrides="AND">
+				<if test="null != uuid">
+					uuid = #{uuid}
+				</if>
+				<if test="null != role">
+					role = #{role}
+				</if>
+				<if test="null != supervisorId">
+					supervisor_id = #{supervisorId}
+				</if>
+				<if test="null != deletedUserId">
+					deleted_user_id = #{deletedUserId}
+				</if>
+				<if test="null != startCreateDate">
+					<![CDATA[create_time >= #{startCreateDate}]]>					
+				</if>
+				<if test="null != endCreateDate">
+					<![CDATA[create_time <= #{endCreateDate}]]>
+				</if>
+				<if test="null != startDeletedDate">
+					<![CDATA[deleted_time >= #{startDeletedDate}]]>					
+				</if>
+				<if test="null != endDeletedDate">
+					<![CDATA[deleted_time <= #{endDeletedDate}]]>
+				</if>
+			</trim>
+		</where>
+		<where>
+			<if test="null != orderBy">
+				ORDER BY ${orderBy}
+			</if>
+			<if test="pageSize != null and null != offset">
+				LIMIT #{pageSize} OFFSET #{offset}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="addMeloUserBackup" parameterType="MeloUserBackup">
+		INSERT INTO melo_user_backup(id,uuid,username,supervisor_id,role,name,address,phone,email,create_time,modify_time,deleted_time,deleted_user_id)
+		VALUES (#{id},#{uuid},#{username},#{supervisorId},#{role},#{name},#{address},#{phone},#{email},#{createTime},#{modifyTime},#{deletedTime},#{deletedUserId})
+	</insert>
+	
+	<delete id="deleteMeloUserBackup" parameterType="long">
+		DELETE FROM melo_user_backup
+		WHERE id = #{id}
+	</delete>
+</mapper>
