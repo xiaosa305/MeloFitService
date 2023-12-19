@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.melosound.fit.domain.cusenum.ResponseCode;
-import com.melosound.fit.domain.response.ApiResponse;
-import com.melosound.fit.domain.response.ApiResponseBuilder;
+import com.melosound.fit.domain.rsp.ApiResponse;
+import com.melosound.fit.domain.rsp.ApiResponseBuilder;
 @RestController
 @RequestMapping("api-client")
 public class ClientController {

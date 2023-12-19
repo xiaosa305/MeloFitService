@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import com.melosound.fit.domain.cusenum.ResponseCode;
-import com.melosound.fit.domain.response.ApiResponse;
-import com.melosound.fit.domain.response.ApiResponseBuilder;
+import com.melosound.fit.domain.rsp.ApiResponse;
+import com.melosound.fit.domain.rsp.ApiResponseBuilder;
+
 import cn.hutool.core.convert.ConvertException;
 import cn.hutool.json.JSONUtil;
 

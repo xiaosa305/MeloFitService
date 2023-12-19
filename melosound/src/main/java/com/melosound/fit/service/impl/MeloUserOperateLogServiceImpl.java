@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.melosound.fit.domain.cusenum.OperateResult;
 import com.melosound.fit.domain.cusenum.OperateType;
-import com.melosound.fit.domain.entity.MeloUserOperateLog;
-import com.melosound.fit.domain.vo.Ret;
+import com.melosound.fit.domain.dto.Ret;
+import com.melosound.fit.domain.po.MeloUserOperateLog;
 import com.melosound.fit.mapper.MeloUserOperateLogMapper;
 import com.melosound.fit.service.MeloUserOperateLogService;
 

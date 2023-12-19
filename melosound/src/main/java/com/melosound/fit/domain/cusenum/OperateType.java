@@ -2,10 +2,11 @@ package com.melosound.fit.domain.cusenum;
 
 public enum OperateType {
 	QUERY(0),
-	ADD(1),
-	DELETE(2),
-	EDIT(3),
-	LOGIN(4);
+	ADD_USER(1),
+	DELETE_USER(2),
+	UPDATE_USER_INFO(3),
+	LOGIN(4),
+	RESET_PASSWORD(5);
 	
 	private final int type;
 	

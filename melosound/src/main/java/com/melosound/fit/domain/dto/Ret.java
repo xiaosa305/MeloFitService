@@ -1,4 +1,4 @@
-package com.melosound.fit.domain.vo;
+package com.melosound.fit.domain.dto;
 
 import com.melosound.fit.domain.cusenum.ResultType;
 

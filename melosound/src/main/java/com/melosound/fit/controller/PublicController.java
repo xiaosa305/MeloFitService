@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.melosound.fit.domain.cusenum.OperateResult;
 import com.melosound.fit.domain.cusenum.OperateType;
 import com.melosound.fit.domain.cusenum.ResponseCode;
 import com.melosound.fit.domain.cusenum.ResultType;
-import com.melosound.fit.domain.cusenum.UserRole;
-import com.melosound.fit.domain.dto.LoginInfoDTO;
-import com.melosound.fit.domain.dto.LoginSuccessDTO;
-import com.melosound.fit.domain.entity.MeloUser;
-import com.melosound.fit.domain.response.ApiResponse;
-import com.melosound.fit.domain.response.ApiResponseBuilder;
-import com.melosound.fit.domain.vo.Ret;
+import com.melosound.fit.domain.dto.JwtTokenDTO;
+import com.melosound.fit.domain.dto.Ret;
+import com.melosound.fit.domain.po.MeloUser;
+import com.melosound.fit.domain.req.LoginInfoRequest;
+import com.melosound.fit.domain.rsp.ApiResponse;
+import com.melosound.fit.domain.rsp.ApiResponseBuilder;
 import com.melosound.fit.service.MeloUserOperateLogService;
 import com.melosound.fit.service.MeloUserService;
 import com.melosound.fit.utils.AESEncryptionUtils;
@@ -58,14 +58,14 @@ public class PublicController {
 			return new ApiResponseBuilder().withCode(ResponseCode.BAD_REQUEST.getCode()).withMessage("请求错误").build();
 		}
 		requestBodySty = aesUtil.decrypt(requestBodySty);
-		LoginInfoDTO dto =JSONUtil.toBean(requestBodySty, LoginInfoDTO.class);
+		LoginInfoRequest dto =JSONUtil.toBean(requestBodySty, LoginInfoRequest.class);
 		if(ObjectUtil.isNull(dto)) {
 			return new ApiResponseBuilder().withCode(ResponseCode.BAD_REQUEST.getCode()).withMessage("请求错误").build();
 		}
 		Ret ret = meloUserService.userLogin(dto.getUsername(), dto.getPassword());
 		if(ResultType.Success == ret.getResult()) {
 			MeloUser user = (MeloUser) ret.getData();
-			LoginSuccessDTO response = new LoginSuccessDTO();
+			JwtTokenDTO response = new JwtTokenDTO();
 			response.setAccessToken(jwtUtil.generateaccessToken(user.getUsername()));
 			response.setRefreshToken(jwtUtil.generaterefreshToken(user.getUsername()));
 			Ret logRet = logService.addLog(StringUtil.EMPTY_STRING, user.getId(), OperateType.LOGIN, OperateResult.SUCCESS,StringUtil.EMPTY_STRING);

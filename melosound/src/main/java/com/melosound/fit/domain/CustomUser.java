@@ -5,7 +5,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import com.melosound.fit.domain.entity.MeloUser;
+import com.melosound.fit.domain.po.MeloUser;
 
 
 public class CustomUser extends User {

@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.melosound.fit.domain.dto.JwtTokenDTO;
-import com.melosound.fit.domain.entity.MeloUser;
-import com.melosound.fit.domain.vo.Ret;
+import com.melosound.fit.domain.dto.Ret;
+import com.melosound.fit.domain.po.MeloUser;
 import com.melosound.fit.mapper.MeloUserMapper;
 import com.melosound.fit.service.JwtTokenService;
 import com.melosound.fit.service.MeloUserService;

@@ -1,4 +1,4 @@
-package com.melosound.fit.domain.response;
+package com.melosound.fit.domain.rsp;
 
 import lombok.Data;
 

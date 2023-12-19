@@ -1,9 +1,9 @@
-package com.melosound.fit.domain.dto;
+package com.melosound.fit.domain.req;
 
 import lombok.Data;
 
 @Data
-public class RegistUserInfoDTO {
+public class RegistUserInfoRequest {
 	private String username;
 	private String password;
 	private String name;

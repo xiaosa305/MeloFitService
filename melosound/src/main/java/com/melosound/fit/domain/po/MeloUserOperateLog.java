@@ -1,4 +1,4 @@
-package com.melosound.fit.domain.entity;
+package com.melosound.fit.domain.po;
 
 import java.util.Date;
 

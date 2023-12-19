@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.melosound.fit.domain.entity.MeloUser;
+import com.melosound.fit.domain.po.MeloUser;
 
 @Mapper
 public interface MeloUserMapper {

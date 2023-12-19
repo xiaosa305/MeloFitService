@@ -19,18 +19,19 @@ import com.melosound.fit.domain.CustomUser;
 import com.melosound.fit.domain.cusenum.OperateResult;
 import com.melosound.fit.domain.cusenum.OperateType;
 import com.melosound.fit.domain.cusenum.UserRole;
-import com.melosound.fit.domain.dto.RegistUserInfoDTO;
-import com.melosound.fit.domain.dto.ResetPasswordDTO;
+import com.melosound.fit.domain.dto.Ret;
 import com.melosound.fit.domain.dto.UserInfoDTO;
-import com.melosound.fit.domain.entity.MeloUser;
-import com.melosound.fit.domain.entity.MeloUserBackup;
-import com.melosound.fit.domain.entity.MeloUserOperateLog;
-import com.melosound.fit.domain.vo.Ret;
+import com.melosound.fit.domain.po.MeloUser;
+import com.melosound.fit.domain.po.MeloUserBackup;
+import com.melosound.fit.domain.po.MeloUserOperateLog;
+import com.melosound.fit.domain.req.RegistUserInfoRequest;
+import com.melosound.fit.domain.req.ResetPasswordRequest;
 import com.melosound.fit.mapper.MeloUserBackupMapper;
 import com.melosound.fit.mapper.MeloUserMapper;
 import com.melosound.fit.mapper.MeloUserOperateLogMapper;
 import com.melosound.fit.service.MeloUserService;
 import com.melosound.fit.utils.CustomMd5PasswordEncoder;
+
 import cn.hutool.core.util.ObjectUtil;
 
 @Service
@@ -108,7 +109,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 	
 	@Override
 	@Transactional
-	public Ret registManager(RegistUserInfoDTO dto,String operatorId) {
+	public Ret registManager(RegistUserInfoRequest dto,String operatorId) {
 		logger.info("registManager: username({})",dto.getUsername());
 		MeloUser find = userMapper.findUserByUsername(dto.getUsername());
 		if(ObjectUtil.isNull(find)) {
@@ -126,7 +127,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 				logMapper.addLog(new MeloUserOperateLog.Builder()
 						.setOperatorId(operatorId)
 						.setTargetId(user.getId())
-						.setOperateType(OperateType.ADD)
+						.setOperateType(OperateType.ADD_USER)
 						.setOperateResult(OperateResult.SUCCESS)
 						.build()
 						);
@@ -138,7 +139,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 	
 	@Override
 	@Transactional
-	public Ret registFitter(RegistUserInfoDTO dto,String operatorId) {
+	public Ret registFitter(RegistUserInfoRequest dto,String operatorId) {
 		logger.info("registManager: username({})",dto.getUsername());
 		MeloUser find = userMapper.findUserByUsername(dto.getUsername());
 		if(ObjectUtil.isNull(find)) {
@@ -156,7 +157,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 				logMapper.addLog(new MeloUserOperateLog.Builder()
 						.setOperatorId(operatorId)
 						.setTargetId(user.getId())
-						.setOperateType(OperateType.ADD)
+						.setOperateType(OperateType.ADD_USER)
 						.setOperateResult(OperateResult.SUCCESS)
 						.build()
 						);
@@ -182,7 +183,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 				logMapper.addLog(new MeloUserOperateLog.Builder()
 						.setOperatorId(operatorId)
 						.setTargetId(find.getId())
-						.setOperateType(OperateType.DELETE)
+						.setOperateType(OperateType.DELETE_USER)
 						.setOperateResult(OperateResult.SUCCESS)
 						.build()
 						);
@@ -208,7 +209,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 				logMapper.addLog(new MeloUserOperateLog.Builder()
 						.setOperatorId(operatorId)
 						.setTargetId(find.getId())
-						.setOperateType(OperateType.DELETE)
+						.setOperateType(OperateType.DELETE_USER)
 						.setOperateResult(OperateResult.SUCCESS)
 						.build()
 						);
@@ -234,7 +235,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 				logMapper.addLog(new MeloUserOperateLog.Builder()
 						.setOperatorId(operatorId)
 						.setTargetId(find.getId())
-						.setOperateType(OperateType.DELETE)
+						.setOperateType(OperateType.DELETE_USER)
 						.setOperateResult(OperateResult.SUCCESS)
 						.build()
 						);
@@ -260,7 +261,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 				logMapper.addLog(new MeloUserOperateLog.Builder()
 						.setOperatorId(operatorId)
 						.setTargetId(find.getId())
-						.setOperateType(OperateType.DELETE)
+						.setOperateType(OperateType.DELETE_USER)
 						.setOperateResult(OperateResult.SUCCESS)
 						.build()
 						);
@@ -272,7 +273,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 	
 	@Override
 	@Transactional
-	public Ret resetManagerPassword(ResetPasswordDTO dto, String operatorId) {
+	public Ret resetManagerPassword(ResetPasswordRequest dto, String operatorId) {
 		MeloUser target = userMapper.findUserByUsername(dto.getUsername());
 		MeloUser operator = userMapper.findUserById(operatorId);
 		if(ObjectUtil.isNull(target)) {
@@ -289,12 +290,23 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 		if(userMapper.updateUser(target) <= 0) {
 			return new Ret.Builder().setMsg("服务器异常").Failure();
 		}
+		try {
+			logMapper.addLog(new MeloUserOperateLog.Builder()
+					.setOperatorId(operatorId)
+					.setTargetId(target.getId())
+					.setOperateType(OperateType.RESET_PASSWORD)
+					.setOperateResult(OperateResult.SUCCESS)
+					.build()
+					);
+		}catch(Exception e) {
+			logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
+		}
 		return new Ret.Builder().Success();
 	}
 
 	@Override
 	@Transactional
-	public Ret resetFitterPassword(ResetPasswordDTO dto, String operatorId) {
+	public Ret resetFitterPassword(ResetPasswordRequest dto, String operatorId) {
 		MeloUser target = userMapper.findUserByUsername(dto.getUsername());
 		MeloUser operator = userMapper.findUserById(operatorId);
 		if(ObjectUtil.isNull(target)) {
@@ -310,6 +322,17 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 		target.setModifyTime(new Date());
 		if(userMapper.updateUser(target) <= 0) {
 			return new Ret.Builder().setMsg("服务器异常").Failure();
+		}
+		try {
+			logMapper.addLog(new MeloUserOperateLog.Builder()
+					.setOperatorId(operatorId)
+					.setTargetId(target.getId())
+					.setOperateType(OperateType.RESET_PASSWORD)
+					.setOperateResult(OperateResult.SUCCESS)
+					.build()
+					);
+		}catch(Exception e) {
+			logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
 		}
 		return new Ret.Builder().Success();
 	}
@@ -330,13 +353,17 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 			find.setEmail(dto.getEmail());
 			find.setModifyTime(new Date());
 			if(userMapper.updateUser(find) > 0) {
-				logMapper.addLog(new MeloUserOperateLog.Builder()
-						.setOperatorId(operatorId)
-						.setTargetId(find.getId())
-						.setOperateType(OperateType.EDIT)
-						.setOperateResult(OperateResult.SUCCESS)
-						.build()
-						);
+				try {
+					logMapper.addLog(new MeloUserOperateLog.Builder()
+							.setOperatorId(operatorId)
+							.setTargetId(find.getId())
+							.setOperateType(OperateType.UPDATE_USER_INFO)
+							.setOperateResult(OperateResult.SUCCESS)
+							.build()
+							);
+				}catch(Exception e) {
+					logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
+				}
 				return new Ret.Builder().setData(find).Success();
 			}
 		}
@@ -359,13 +386,17 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 			find.setEmail(dto.getEmail());
 			find.setModifyTime(new Date());
 			if(userMapper.updateUser(find) > 0) {
-				logMapper.addLog(new MeloUserOperateLog.Builder()
-						.setOperatorId(operatorId)
-						.setTargetId(find.getId())
-						.setOperateType(OperateType.EDIT)
-						.setOperateResult(OperateResult.SUCCESS)
-						.build()
-						);
+				try {
+					logMapper.addLog(new MeloUserOperateLog.Builder()
+							.setOperatorId(operatorId)
+							.setTargetId(find.getId())
+							.setOperateType(OperateType.UPDATE_USER_INFO)
+							.setOperateResult(OperateResult.SUCCESS)
+							.build()
+							);
+				}catch(Exception e) {
+					logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
+				}
 				return new Ret.Builder().setData(find).Success();
 			}
 		}
