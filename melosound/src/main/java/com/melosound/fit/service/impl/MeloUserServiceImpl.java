@@ -24,7 +24,7 @@ import com.melosound.fit.domain.dto.UserInfoDTO;
 import com.melosound.fit.domain.po.MeloUser;
 import com.melosound.fit.domain.po.MeloUserBackup;
 import com.melosound.fit.domain.po.MeloUserOperateLog;
-import com.melosound.fit.domain.req.RegistUserInfoRequest;
+import com.melosound.fit.domain.req.UserInfoRequest;
 import com.melosound.fit.domain.req.ResetPasswordRequest;
 import com.melosound.fit.mapper.MeloUserBackupMapper;
 import com.melosound.fit.mapper.MeloUserMapper;
@@ -109,7 +109,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 	
 	@Override
 	@Transactional
-	public Ret registManager(RegistUserInfoRequest dto,String operatorId) {
+	public Ret registManager(UserInfoRequest dto,String operatorId) {
 		logger.info("registManager: username({})",dto.getUsername());
 		MeloUser find = userMapper.findUserByUsername(dto.getUsername());
 		if(ObjectUtil.isNull(find)) {
@@ -131,7 +131,16 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 						.setOperateResult(OperateResult.SUCCESS)
 						.build()
 						);
-				return new Ret.Builder().setData(user).Success();
+				UserInfoDTO data = new UserInfoDTO();
+				data.setUsername(user.getUsername());
+				data.setName(user.getName());
+				data.setAddress(user.getAddress());
+				data.setPhone(user.getPhone());
+				data.setEmail(user.getEmail());
+				data.setRole(user.getRole());
+				data.setCreateTime(user.getCreateTime());
+				data.setModifyTIme(user.getModifyTime());
+				return new Ret.Builder().setData(data).Success();
 			}
 		}
 		return new Ret.Builder().setMsg("账号已存在").Failure();
@@ -139,7 +148,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 	
 	@Override
 	@Transactional
-	public Ret registFitter(RegistUserInfoRequest dto,String operatorId) {
+	public Ret registFitter(UserInfoRequest dto,String operatorId) {
 		logger.info("registManager: username({})",dto.getUsername());
 		MeloUser find = userMapper.findUserByUsername(dto.getUsername());
 		if(ObjectUtil.isNull(find)) {
@@ -161,7 +170,16 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 						.setOperateResult(OperateResult.SUCCESS)
 						.build()
 						);
-				return new Ret.Builder().setData(user).Success();
+				UserInfoDTO data = new UserInfoDTO();
+				data.setUsername(user.getUsername());
+				data.setName(user.getName());
+				data.setAddress(user.getAddress());
+				data.setPhone(user.getPhone());
+				data.setEmail(user.getEmail());
+				data.setRole(user.getRole());
+				data.setCreateTime(user.getCreateTime());
+				data.setModifyTIme(user.getModifyTime());
+				return new Ret.Builder().setData(data).Success();
 			}
 		}
 		return new Ret.Builder().setMsg("账号已存在").Failure();
@@ -301,7 +319,15 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 		}catch(Exception e) {
 			logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
 		}
-		return new Ret.Builder().Success();
+		UserInfoDTO data = new UserInfoDTO();
+		data.setUsername(target.getUsername());
+		data.setName(target.getName());
+		data.setAddress(target.getAddress());
+		data.setPhone(target.getPhone());
+		data.setEmail(target.getEmail());
+		data.setCreateTime(target.getCreateTime());
+		data.setModifyTIme(target.getModifyTime());
+		return new Ret.Builder().setData(data).Success();
 	}
 
 	@Override
@@ -334,12 +360,20 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 		}catch(Exception e) {
 			logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
 		}
-		return new Ret.Builder().Success();
+		UserInfoDTO data = new UserInfoDTO();
+		data.setUsername(target.getUsername());
+		data.setName(target.getName());
+		data.setAddress(target.getAddress());
+		data.setPhone(target.getPhone());
+		data.setEmail(target.getEmail());
+		data.setCreateTime(target.getCreateTime());
+		data.setModifyTIme(target.getModifyTime());
+		return new Ret.Builder().setData(data).Success();
 	}
 
 	@Override
 	@Transactional
-	public Ret updateManager(UserInfoDTO dto,String operatorId) {
+	public Ret updateManager(UserInfoRequest dto,String operatorId) {
 		logger.info("modifyManager: username({})",dto.getUsername());
 		MeloUser find = userMapper.findUserByUsername(dto.getUsername());
 		MeloUser operator = userMapper.findUserById(operatorId);
@@ -364,7 +398,15 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 				}catch(Exception e) {
 					logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
 				}
-				return new Ret.Builder().setData(find).Success();
+				UserInfoDTO data = new UserInfoDTO();
+				data.setUsername(find.getUsername());
+				data.setName(find.getName());
+				data.setAddress(find.getAddress());
+				data.setPhone(find.getPhone());
+				data.setEmail(find.getEmail());
+				data.setCreateTime(find.getCreateTime());
+				data.setModifyTIme(find.getModifyTime());
+				return new Ret.Builder().setData(data).Success();
 			}
 		}
 		return new Ret.Builder().setMsg("用户不存在").Failure();
@@ -372,7 +414,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 
 	@Override
 	@Transactional
-	public Ret updateFitter(UserInfoDTO dto,String operatorId) {
+	public Ret updateFitter(UserInfoRequest dto,String operatorId) {
 		logger.info("modifyManager: username({})",dto.getUsername());
 		MeloUser find = userMapper.findUserByUsername(dto.getUsername());
 		MeloUser operator = userMapper.findUserById(operatorId);
@@ -397,7 +439,15 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 				}catch(Exception e) {
 					logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
 				}
-				return new Ret.Builder().setData(find).Success();
+				UserInfoDTO data = new UserInfoDTO();
+				data.setUsername(find.getUsername());
+				data.setName(find.getName());
+				data.setAddress(find.getAddress());
+				data.setPhone(find.getPhone());
+				data.setEmail(find.getEmail());
+				data.setCreateTime(find.getCreateTime());
+				data.setModifyTIme(find.getModifyTime());
+				return new Ret.Builder().setData(data).Success();
 			}
 		}
 		return new Ret.Builder().setMsg("用户不存在").Failure();

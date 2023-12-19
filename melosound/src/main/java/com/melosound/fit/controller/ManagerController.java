@@ -18,10 +18,9 @@ import com.melosound.fit.domain.cusenum.ResponseCode;
 import com.melosound.fit.domain.cusenum.ResultType;
 import com.melosound.fit.domain.cusenum.UserRole;
 import com.melosound.fit.domain.dto.Ret;
-import com.melosound.fit.domain.dto.UserInfoDTO;
 import com.melosound.fit.domain.po.MeloUser;
 import com.melosound.fit.domain.po.MeloUserOperateLog;
-import com.melosound.fit.domain.req.RegistUserInfoRequest;
+import com.melosound.fit.domain.req.UserInfoRequest;
 import com.melosound.fit.domain.req.ResetPasswordRequest;
 import com.melosound.fit.domain.rsp.ApiResponse;
 import com.melosound.fit.domain.rsp.ApiResponseBuilder;
@@ -65,7 +64,7 @@ public class ManagerController {
 		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
 		if(StringUtil.isNullOrEmpty(requestStr)) {
 			requestStr = aesUtil.decrypt(requestStr);
-			RegistUserInfoRequest dto = JSONUtil.toBean(requestStr, RegistUserInfoRequest.class);
+			UserInfoRequest dto = JSONUtil.toBean(requestStr, UserInfoRequest.class);
 			if(ObjectUtil.isNotNull(dto)) {
 				Ret ret = userService.registFitter(dto,operator_id);
 				if(ResultType.Success == ret.getResult()) {
@@ -98,7 +97,8 @@ public class ManagerController {
 				Ret ret = userService.resetManagerPassword(dto, operator_id);
 				if(ResultType.Success == ret.getResult()) {
 					return new ApiResponseBuilder()
-					.withCode(ResponseCode.SUCCESS.getCode()).build();
+							.withData(ret.getData())
+							.withCode(ResponseCode.SUCCESS.getCode()).build();
 				}
 				return new ApiResponseBuilder()
 						.withCode(ResponseCode.ERROR.getCode()).withMessage(ret.getMsg()).build();
@@ -120,7 +120,8 @@ public class ManagerController {
 				Ret ret = userService.resetFitterPassword(dto, operator_id);
 				if(ResultType.Success == ret.getResult()) {
 					return new ApiResponseBuilder()
-					.withCode(ResponseCode.SUCCESS.getCode()).build();
+							.withData(ret.getData())
+							.withCode(ResponseCode.SUCCESS.getCode()).build();
 				}
 				return new ApiResponseBuilder()
 						.withCode(ResponseCode.ERROR.getCode()).withMessage(ret.getMsg()).build();
@@ -136,12 +137,12 @@ public class ManagerController {
 		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
 		if(StringUtil.isNullOrEmpty(requestStr)) {
 			requestStr = aesUtil.decrypt(requestStr);
-			UserInfoDTO dto = JSONUtil.toBean(requestStr, UserInfoDTO.class);
-			if(ObjectUtil.isNotNull(dto)) {
-				Ret ret = userService.updateManager(dto, operator_id);
+			UserInfoRequest userInfo = JSONUtil.toBean(requestStr, UserInfoRequest.class);
+			if(ObjectUtil.isNotNull(userInfo)) {
+				Ret ret = userService.updateManager(userInfo, operator_id);
 				if(ResultType.Success == ret.getResult()) {
 					return new ApiResponseBuilder()
-							.withData(dto)
+							.withData(ret.getData())
 							.withCode(ResponseCode.SUCCESS.getCode()).build();
 				}
 				return new ApiResponseBuilder()
@@ -159,12 +160,12 @@ public class ManagerController {
 		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
 		if(StringUtil.isNullOrEmpty(requestStr)) {
 			requestStr = aesUtil.decrypt(requestStr);
-			UserInfoDTO dto = JSONUtil.toBean(requestStr, UserInfoDTO.class);
-			if(ObjectUtil.isNotNull(dto)) {
-				Ret ret = userService.updateFitter(dto, operator_id);
+			UserInfoRequest userInfo = JSONUtil.toBean(requestStr, UserInfoRequest.class);
+			if(ObjectUtil.isNotNull(userInfo)) {
+				Ret ret = userService.updateFitter(userInfo, operator_id);
 				if(ResultType.Success == ret.getResult()) {
 					return new ApiResponseBuilder()
-							.withData(dto)
+							.withData(ret.getData())
 							.withCode(ResponseCode.SUCCESS.getCode()).build();
 				}
 				return new ApiResponseBuilder()

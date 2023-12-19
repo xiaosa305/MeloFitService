@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.melosound.fit.domain.cusenum.ResponseCode;
 import com.melosound.fit.domain.cusenum.ResultType;
-import com.melosound.fit.domain.dto.RefreshTokenDTO;
 import com.melosound.fit.domain.dto.Ret;
+import com.melosound.fit.domain.req.RefreshTokenRequest;
 import com.melosound.fit.domain.rsp.ApiResponse;
 import com.melosound.fit.domain.rsp.ApiResponseBuilder;
 import com.melosound.fit.service.JwtTokenService;
@@ -42,7 +42,7 @@ public class JwtTokenController {
 		logger.info("refreshToken: ");
 		if(!StringUtil.isNullOrEmpty(requestBodyStr)) {
 			requestBodyStr = aesUtil.decrypt(requestBodyStr);
-			RefreshTokenDTO dto = JSONUtil.toBean(requestBodyStr, RefreshTokenDTO.class);
+			RefreshTokenRequest dto = JSONUtil.toBean(requestBodyStr, RefreshTokenRequest.class);
 			if(ObjectUtil.isNotNull(dto) && jwtUtil.validaterefreshToken(dto.getRefreshToken())) {
 				Ret ret = jwtTokenService.refreshAccessJwtToken(dto.getRefreshToken());
 				if(ResultType.Success == ret.getResult()) {
