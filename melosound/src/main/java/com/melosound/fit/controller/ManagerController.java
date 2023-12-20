@@ -18,6 +18,7 @@ import com.melosound.fit.domain.cusenum.ResponseCode;
 import com.melosound.fit.domain.cusenum.ResultType;
 import com.melosound.fit.domain.cusenum.UserRole;
 import com.melosound.fit.domain.dto.Ret;
+import com.melosound.fit.domain.dto.UserInfoDTO;
 import com.melosound.fit.domain.po.MeloUser;
 import com.melosound.fit.domain.po.MeloUserOperateLog;
 import com.melosound.fit.domain.req.UserInfoRequest;
@@ -53,6 +54,28 @@ public class ManagerController {
 	
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
+	
+	
+	@PostMapping("getManagerInfo")
+	public ApiResponse getManagerInfo(HttpServletRequest request)throws Exception {
+		logger.info("getManagerInfo API:");
+		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
+		Ret ret = userService.findUserById(operator_id);
+		if(ResultType.Success == ret.getResult()) {
+			MeloUser user = (MeloUser) ret.getData();
+			UserInfoDTO dto = new UserInfoDTO();
+			dto.setUsername(user.getUsername());
+			dto.setName(user.getName());
+			dto.setAddress(user.getAddress());
+			dto.setPhone(user.getPhone());
+			dto.setEmail(user.getEmail());
+			dto.setRole(user.getRole());
+			dto.setCreateTime(user.getCreateTime());
+			dto.setModifyTIme(user.getModifyTime());
+			return new ApiResponseBuilder().withCode(ResponseCode.SUCCESS.getCode()).withData(dto).build();
+		}
+		return new ApiResponseBuilder().withCode(ResponseCode.ERROR.getCode()).withMessage("用户不存在").build();
+	}
 	
 	
 	@PostMapping("registFitter")

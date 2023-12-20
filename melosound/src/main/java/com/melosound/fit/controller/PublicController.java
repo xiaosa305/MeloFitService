@@ -46,8 +46,9 @@ public class PublicController {
 
 	
 	
-	@PostMapping("check-server-status")
+	@PostMapping("checkServerStatus")
     public ApiResponse checkServerStatus() {
+		logger.info("checkServerStatus");
         return new ApiResponseBuilder().withCode(ResponseCode.SUCCESS.getCode()).withMessage("Server is running and connected successfully.").build();
     }
 
