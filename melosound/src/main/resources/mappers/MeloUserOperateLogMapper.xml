@@ -74,8 +74,8 @@
 	</select>
 	
 	<insert id="addLog" parameterType="MeloUserOperateLog">
-		INSERT INTO melo_user_operate_log(operator_id,target_id,create_time,operate_type,operate_result,failure_reson,deleted)
-		VALUES (#{operatorId},#{targetId},#{createTime},#{operateType},#{operateResult},#{failureReson},#{deleted})
+		INSERT INTO melo_user_operate_log(operator_id,target_id,create_time,operate_type,operate_name,operate_result,failure_reson,deleted)
+		VALUES (#{operatorId},#{targetId},#{createTime},#{operateType},#{operateName},#{operateResult},#{failureReson},#{deleted})
 	</insert>
 	
 	<delete id="deleteLog" parameterType="long">

@@ -14,6 +14,7 @@ public class MeloUserOperateLog {
 	private String operatorId;
 	private String targetId;
 	private int operateType;
+	private String operateName;
 	private int operateResult;
 	private String failureReson;
 	private boolean deleted;
@@ -49,6 +50,7 @@ public class MeloUserOperateLog {
 			log.setOperatorId(this.operatorId);
 			log.setTargetId(this.targetId);
 			log.setOperateType(this.operateType.getType());
+			log.setOperateName(this.operateType.getName());
 			log.setOperateResult(this.operateResult.getResult());
 			log.setFailureReson(this.failureReson);
 			log.setCreateTime(new Date());

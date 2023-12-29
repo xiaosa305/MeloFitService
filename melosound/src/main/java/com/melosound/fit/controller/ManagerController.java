@@ -22,6 +22,7 @@ import com.melosound.fit.domain.dto.UserInfoDTO;
 import com.melosound.fit.domain.po.MeloUser;
 import com.melosound.fit.domain.po.MeloUserOperateLog;
 import com.melosound.fit.domain.req.UserInfoRequest;
+import com.melosound.fit.domain.req.DeleteUserRequest;
 import com.melosound.fit.domain.req.ResetPasswordRequest;
 import com.melosound.fit.domain.rsp.ApiResponse;
 import com.melosound.fit.domain.rsp.ApiResponseBuilder;
@@ -42,9 +43,6 @@ public class ManagerController {
 	
 	@Autowired
 	private MeloUserService userService;
-		
-	@Autowired
-	private MeloUserOperateLogService logService;
 	
 	@Autowired
 	private AESEncryptionUtils aesUtil;
@@ -56,26 +54,7 @@ public class ManagerController {
 	private RedisTemplate<String, Object> redisTemplate;
 	
 	
-	@PostMapping("getManagerInfo")
-	public ApiResponse getManagerInfo(HttpServletRequest request)throws Exception {
-		logger.info("getManagerInfo API:");
-		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
-		Ret ret = userService.findUserById(operator_id);
-		if(ResultType.Success == ret.getResult()) {
-			MeloUser user = (MeloUser) ret.getData();
-			UserInfoDTO dto = new UserInfoDTO();
-			dto.setUsername(user.getUsername());
-			dto.setName(user.getName());
-			dto.setAddress(user.getAddress());
-			dto.setPhone(user.getPhone());
-			dto.setEmail(user.getEmail());
-			dto.setRole(user.getRole());
-			dto.setCreateTime(user.getCreateTime());
-			dto.setModifyTIme(user.getModifyTime());
-			return new ApiResponseBuilder().withCode(ResponseCode.SUCCESS.getCode()).withData(dto).build();
-		}
-		return new ApiResponseBuilder().withCode(ResponseCode.ERROR.getCode()).withMessage("用户不存在").build();
-	}
+	
 	
 	
 	@PostMapping("registFitter")
@@ -85,7 +64,7 @@ public class ManagerController {
 		String msg = StringUtil.EMPTY_STRING;
 		Object data = null;
 		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
-		if(StringUtil.isNullOrEmpty(requestStr)) {
+		if(!StringUtil.isNullOrEmpty(requestStr)) {
 			requestStr = aesUtil.decrypt(requestStr);
 			UserInfoRequest dto = JSONUtil.toBean(requestStr, UserInfoRequest.class);
 			if(ObjectUtil.isNotNull(dto)) {
@@ -113,7 +92,7 @@ public class ManagerController {
 	public ApiResponse resetManagePassword(@RequestBody String requestStr,HttpServletRequest request) throws Exception{
 		logger.info("resetManagePassword");
 		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
-		if(StringUtil.isNullOrEmpty(requestStr)) {
+		if(!StringUtil.isNullOrEmpty(requestStr)) {
 			requestStr = aesUtil.decrypt(requestStr);
 			ResetPasswordRequest dto = JSONUtil.toBean(requestStr, ResetPasswordRequest.class);
 			if(ObjectUtil.isNotNull(dto)) {
@@ -136,13 +115,13 @@ public class ManagerController {
 	public ApiResponse resetFitterPassword(@RequestBody String requestStr,HttpServletRequest request) throws Exception{
 		logger.info("resetFitterPassword");
 		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
-		if(StringUtil.isNullOrEmpty(requestStr)) {
+		if(!StringUtil.isNullOrEmpty(requestStr)) {
 			requestStr = aesUtil.decrypt(requestStr);
 			ResetPasswordRequest dto = JSONUtil.toBean(requestStr, ResetPasswordRequest.class);
 			if(ObjectUtil.isNotNull(dto)) {
 				Ret ret = userService.resetFitterPassword(dto, operator_id);
 				if(ResultType.Success == ret.getResult()) {
-					return new ApiResponseBuilder()
+					return new ApiResponseBuilder()	
 							.withData(ret.getData())
 							.withCode(ResponseCode.SUCCESS.getCode()).build();
 				}
@@ -158,7 +137,7 @@ public class ManagerController {
 	public ApiResponse updateManagerInfo(@RequestBody String requestStr,HttpServletRequest request) throws Exception{
 		logger.info("updateManagerInfo");
 		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
-		if(StringUtil.isNullOrEmpty(requestStr)) {
+		if(!StringUtil.isNullOrEmpty(requestStr)) {
 			requestStr = aesUtil.decrypt(requestStr);
 			UserInfoRequest userInfo = JSONUtil.toBean(requestStr, UserInfoRequest.class);
 			if(ObjectUtil.isNotNull(userInfo)) {
@@ -181,11 +160,11 @@ public class ManagerController {
 	public ApiResponse updateFitterInfo(@RequestBody String requestStr,HttpServletRequest request) throws Exception{
 		logger.info("updateFitterInfo");
 		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
-		if(StringUtil.isNullOrEmpty(requestStr)) {
+		if(!StringUtil.isNullOrEmpty(requestStr)) {
 			requestStr = aesUtil.decrypt(requestStr);
 			UserInfoRequest userInfo = JSONUtil.toBean(requestStr, UserInfoRequest.class);
 			if(ObjectUtil.isNotNull(userInfo)) {
-				Ret ret = userService.updateFitter(userInfo, operator_id);
+				Ret ret = userService.updateFitterByManager(userInfo, operator_id);
 				if(ResultType.Success == ret.getResult()) {
 					return new ApiResponseBuilder()
 							.withData(ret.getData())
@@ -200,11 +179,23 @@ public class ManagerController {
 	}
 	
 	@PostMapping("deleteFitter")
-	public ApiResponse deleteFitter() {
-		ResponseCode code = ResponseCode.SERVER_ERROR;
-		String msg = StringUtil.EMPTY_STRING;
-		Object data = null;
+	public ApiResponse deleteFitter(@RequestBody String requestStr,HttpServletRequest request) {
+		logger.info("deleteFitterByManager");
+		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
+		if(!StringUtil.isNullOrEmpty(requestStr)) {
+			requestStr = aesUtil.decrypt(requestStr);
+			DeleteUserRequest deleteRequest = JSONUtil.toBean(requestStr, DeleteUserRequest.class);
+			if(ObjectUtil.isNotNull(deleteRequest)) {
+				Ret ret = userService.removeFitterByUsername(deleteRequest.getUsername(), operator_id);
+				if(ResultType.Success == ret.getResult()) {
+					return new ApiResponseBuilder()
+							.withCode(ResponseCode.SUCCESS.getCode()).build();
+				}
+				return new ApiResponseBuilder()
+						.withCode(ResponseCode.ERROR.getCode()).withMessage(ret.getMsg()).build();
+			}
+		}
 		return new ApiResponseBuilder()
-				.withCode(code.getCode()).withMessage(msg).withData(data).build();
+				.withCode(ResponseCode.SERVER_ERROR.getCode()).withMessage("数据格式错误").build();
 	}
 }

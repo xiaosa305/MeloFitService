@@ -25,6 +25,7 @@ public interface MeloUserService {
 	public Ret resetFitterPassword(ResetPasswordRequest dto,String operatorId);
 	public Ret updateManager(UserInfoRequest dto,String operatorId);
 	public Ret updateFitter(UserInfoRequest dto,String operatorId);
+	public Ret updateFitterByManager(UserInfoRequest dto,String operatorId);
 	//查集合
 	public List<MeloUser> queryManagers(int pageSize,int offset);
 	public List<MeloUser> queryFitters(int pageSize,int offset);

@@ -1,5 +1,7 @@
 package com.melosound.fit.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,18 @@ public class JwtTokenController {
 	
 	@Autowired
 	private JwtUtils jwtUtil;
+	
+	@PostMapping("checkTokenEnable")
+	public ApiResponse checkAccessTokenEnable(@RequestBody String requestBodyStr,HttpServletRequest request) {
+		logger.info("checkAccessTokenEnable API:");
+		requestBodyStr = aesUtil.decrypt(requestBodyStr);
+		boolean pass = jwtUtil.validateAccessToken(requestBodyStr);
+		if(pass) {
+			return new ApiResponseBuilder().withCode(ResponseCode.SUCCESS.getCode()).build();
+		}else {
+			return new ApiResponseBuilder().withCode(ResponseCode.ERROR.getCode()).build();
+		}
+	}
 	
 	
 	@PostMapping("refreshToken")

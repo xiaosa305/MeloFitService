@@ -33,6 +33,7 @@ import com.melosound.fit.service.MeloUserService;
 import com.melosound.fit.utils.CustomMd5PasswordEncoder;
 
 import cn.hutool.core.util.ObjectUtil;
+import io.netty.util.internal.StringUtil;
 
 @Service
 public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
@@ -115,7 +116,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 		if(ObjectUtil.isNull(find)) {
 			MeloUser user = new MeloUser.Builder()
 					.setUsername(dto.getUsername())
-					.setPassword(dto.getPassword())
+					.setPassword(passwordEncoder.encode(dto.getPassword()))
 					.setName(dto.getName())
 					.setAddress(dto.getAddress())
 					.setPhone(dto.getPhone())
@@ -123,6 +124,9 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 					.setSupervisorId(operatorId)
 					.setRole(UserRole.MANAGER.getRole())
 					.build();
+			if(StringUtil.isNullOrEmpty(user.getName())) {
+				user.setName(user.getUsername());
+			}
 			if(userMapper.addUser(user) > 0) {
 				logMapper.addLog(new MeloUserOperateLog.Builder()
 						.setOperatorId(operatorId)
@@ -132,6 +136,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 						.build()
 						);
 				UserInfoDTO data = new UserInfoDTO();
+				data.setId(user.getId());
 				data.setUsername(user.getUsername());
 				data.setName(user.getName());
 				data.setAddress(user.getAddress());
@@ -149,12 +154,12 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 	@Override
 	@Transactional
 	public Ret registFitter(UserInfoRequest dto,String operatorId) {
-		logger.info("registManager: username({})",dto.getUsername());
+		logger.info("registFitter: username({})",dto.getUsername());
 		MeloUser find = userMapper.findUserByUsername(dto.getUsername());
 		if(ObjectUtil.isNull(find)) {
 			MeloUser user = new MeloUser.Builder()
 					.setUsername(dto.getUsername())
-					.setPassword(dto.getPassword())
+					.setPassword(passwordEncoder.encode(dto.getPassword()))
 					.setName(dto.getName())
 					.setAddress(dto.getAddress())
 					.setPhone(dto.getPhone())
@@ -162,6 +167,9 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 					.setSupervisorId(operatorId)
 					.setRole(UserRole.FITTER.getRole())
 					.build();
+			if(StringUtil.isNullOrEmpty(user.getName())) {
+				user.setName(user.getUsername());
+			}
 			if(userMapper.addUser(user) > 0) {
 				logMapper.addLog(new MeloUserOperateLog.Builder()
 						.setOperatorId(operatorId)
@@ -171,6 +179,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 						.build()
 						);
 				UserInfoDTO data = new UserInfoDTO();
+				data.setId(user.getId());
 				data.setUsername(user.getUsername());
 				data.setName(user.getName());
 				data.setAddress(user.getAddress());
@@ -320,6 +329,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 			logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
 		}
 		UserInfoDTO data = new UserInfoDTO();
+		data.setId(target.getId());
 		data.setUsername(target.getUsername());
 		data.setName(target.getName());
 		data.setAddress(target.getAddress());
@@ -361,6 +371,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 			logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
 		}
 		UserInfoDTO data = new UserInfoDTO();
+		data.setId(target.getId());
 		data.setUsername(target.getUsername());
 		data.setName(target.getName());
 		data.setAddress(target.getAddress());
@@ -399,6 +410,7 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 					logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
 				}
 				UserInfoDTO data = new UserInfoDTO();
+				data.setId(find.getId());
 				data.setUsername(find.getUsername());
 				data.setName(find.getName());
 				data.setAddress(find.getAddress());
@@ -440,6 +452,50 @@ public class MeloUserServiceImpl implements MeloUserService,UserDetailsService {
 					logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
 				}
 				UserInfoDTO data = new UserInfoDTO();
+				data.setId(find.getId());
+				data.setUsername(find.getUsername());
+				data.setName(find.getName());
+				data.setAddress(find.getAddress());
+				data.setPhone(find.getPhone());
+				data.setEmail(find.getEmail());
+				data.setCreateTime(find.getCreateTime());
+				data.setModifyTIme(find.getModifyTime());
+				return new Ret.Builder().setData(data).Success();
+			}
+		}
+		return new Ret.Builder().setMsg("用户不存在").Failure();
+	}
+	
+	@Override
+	@Transactional
+	public Ret updateFitterByManager(UserInfoRequest dto,String operatorId) {
+		logger.info("modifyManager: username({})",dto.getUsername());
+		MeloUser find = userMapper.findUserByUsername(dto.getUsername());
+		MeloUser operator = userMapper.findUserById(operatorId);
+		if(ObjectUtil.isNotNull(find)) {
+			if(!(UserRole.SUPERADMIN.getRole().equals(operator.getRole()) || find.getSupervisorId().equals(operatorId))) {
+				return new Ret.Builder().setMsg("没有权限").Failure();
+			}
+			find.setPassword(passwordEncoder.encode(dto.getPassword()));
+			find.setName(dto.getName());
+			find.setAddress(dto.getAddress());
+			find.setPhone(dto.getPhone());
+			find.setEmail(dto.getEmail());
+			find.setModifyTime(new Date());
+			if(userMapper.updateUser(find) > 0) {
+				try {
+					logMapper.addLog(new MeloUserOperateLog.Builder()
+							.setOperatorId(operatorId)
+							.setTargetId(find.getId())
+							.setOperateType(OperateType.UPDATE_USER_INFO)
+							.setOperateResult(OperateResult.SUCCESS)
+							.build()
+							);
+				}catch(Exception e) {
+					logger.error("ResetManagerPassword add log Error: {}",e.getMessage());
+				}
+				UserInfoDTO data = new UserInfoDTO();
+				data.setId(find.getId());
 				data.setUsername(find.getUsername());
 				data.setName(find.getName());
 				data.setAddress(find.getAddress());

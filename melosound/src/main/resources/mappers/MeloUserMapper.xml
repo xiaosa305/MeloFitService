@@ -64,7 +64,7 @@
 	</select>
 	
 	<insert id="addUser" parameterType="MeloUser">
-		INSERT INTO melo_user(id,username,password,supervisor_id,role,name,address,phone,email,create_time,,modify_time)
+		INSERT INTO melo_user(id,username,password,supervisor_id,role,name,address,phone,email,create_time,modify_time)
 		VALUES (#{id},#{username},#{password},#{supervisorId},#{role},#{name},#{address},#{phone},#{email},#{createTime},#{modifyTime})
 	</insert>
 	
@@ -74,7 +74,7 @@
 	</delete>
 	
 	<update id="updateUser" parameterType="MeloUser">
-		UPDATE melo_user_base
+		UPDATE melo_user
 		SET password = #{password},name = #{name},address = #{address},phone = #{phone},email = #{email},modify_time = #{modifyTime}
 		WHERE id = #{id}
 	</update>

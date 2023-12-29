@@ -1,9 +1,12 @@
 package com.melosound.fit.controller;
 
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,14 +18,18 @@ import com.melosound.fit.domain.cusenum.ResponseCode;
 import com.melosound.fit.domain.cusenum.ResultType;
 import com.melosound.fit.domain.dto.JwtTokenDTO;
 import com.melosound.fit.domain.dto.Ret;
+import com.melosound.fit.domain.dto.UserInfoDTO;
 import com.melosound.fit.domain.po.MeloUser;
 import com.melosound.fit.domain.req.LoginInfoRequest;
+import com.melosound.fit.domain.req.UserInfoRequest;
 import com.melosound.fit.domain.rsp.ApiResponse;
 import com.melosound.fit.domain.rsp.ApiResponseBuilder;
 import com.melosound.fit.service.MeloUserOperateLogService;
 import com.melosound.fit.service.MeloUserService;
 import com.melosound.fit.utils.AESEncryptionUtils;
 import com.melosound.fit.utils.JwtUtils;
+import com.melosound.fit.utils.RedisKeyUtil;
+
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import io.netty.util.internal.StringUtil;
@@ -42,15 +49,40 @@ public class PublicController {
 	private AESEncryptionUtils aesUtil;
 	
 	@Autowired
-	private MeloUserService meloUserService;
+	private RedisKeyUtil keyUtil;
+	
+	@Autowired
+	private MeloUserService userService;
+	
+	@Autowired
+	private RedisTemplate<String, Object> redisTemplate;
+	
+	
 
 	
 	
 	@PostMapping("checkServerStatus")
     public ApiResponse checkServerStatus() {
-		logger.info("checkServerStatus");
+		logger.info("checkServerStatus API:");
         return new ApiResponseBuilder().withCode(ResponseCode.SUCCESS.getCode()).withMessage("Server is running and connected successfully.").build();
     }
+	
+	@PostMapping("test")
+	public ApiResponse test(HttpServletRequest request) {
+		logger.info("test API: ");
+		Ret ret = userService.findUserByUsername("xiaosa");
+		MeloUser operator = (MeloUser) ret.getData();
+		UserInfoRequest fitter = new UserInfoRequest();
+		fitter.setUsername("fitter1");
+		fitter.setPassword("123456");
+		ret =  userService.registFitter(fitter, operator.getId());
+		if(ret.getResult() == ResultType.Success) {
+			return new ApiResponseBuilder().withCode(ResponseCode.SUCCESS.getCode()).withData(ret.getData()).build();
+		}
+		return new ApiResponseBuilder().withCode(ResponseCode.ERROR.getCode()).withMessage("注册失败").build();
+	}
+	
+	
 
 	@PostMapping("login")
 	public ApiResponse login(@RequestBody String requestBodySty) throws Exception {
@@ -63,25 +95,37 @@ public class PublicController {
 		if(ObjectUtil.isNull(dto)) {
 			return new ApiResponseBuilder().withCode(ResponseCode.BAD_REQUEST.getCode()).withMessage("请求错误").build();
 		}
-		Ret ret = meloUserService.userLogin(dto.getUsername(), dto.getPassword());
+		Ret ret = userService.userLogin(dto.getUsername(), dto.getPassword());
 		if(ResultType.Success == ret.getResult()) {
 			MeloUser user = (MeloUser) ret.getData();
 			JwtTokenDTO response = new JwtTokenDTO();
 			response.setAccessToken(jwtUtil.generateaccessToken(user.getUsername()));
 			response.setRefreshToken(jwtUtil.generaterefreshToken(user.getUsername()));
-			Ret logRet = logService.addLog(StringUtil.EMPTY_STRING, user.getId(), OperateType.LOGIN, OperateResult.SUCCESS,StringUtil.EMPTY_STRING);
-			if(ResultType.Failure == logRet.getResult()) {
-				logger.error("Login Completed Add Log Failure: {}",logRet.getMsg());
-			}
 			return new ApiResponseBuilder().withCode(ResponseCode.SUCCESS.getCode()).withMessage("登录成功")
 					.withData(response).build();
 		}
 		return new ApiResponseBuilder().withCode(ResponseCode.ERROR.getCode()).withMessage(ret.getMsg()).build();
 	}
 	
-	@PostMapping("loginAdministrator")
-	public ApiResponse loginAdministrator(@RequestBody String requestStr) throws Exception {
-		logger.info("loginAdministrator API");
-		return null;
+	@PostMapping("getUserInfo")
+	public ApiResponse getUserInfo(HttpServletRequest request)throws Exception {
+		logger.info("getManagerInfo API:");
+		String operator_id = (String) redisTemplate.opsForValue().get(keyUtil.getUserSessionKey(request.getSession().getId()));
+		Ret ret = userService.findUserById(operator_id);
+		if(ResultType.Success == ret.getResult()) {
+			MeloUser user = (MeloUser) ret.getData();
+			UserInfoDTO dto = new UserInfoDTO();
+			dto.setId(user.getId());
+			dto.setUsername(user.getUsername());
+			dto.setName(user.getName());
+			dto.setAddress(user.getAddress());
+			dto.setPhone(user.getPhone());
+			dto.setEmail(user.getEmail());
+			dto.setRole(user.getRole());
+			dto.setCreateTime(user.getCreateTime());
+			dto.setModifyTIme(user.getModifyTime());
+			return new ApiResponseBuilder().withCode(ResponseCode.SUCCESS.getCode()).withData(dto).build();
+		}
+		return new ApiResponseBuilder().withCode(ResponseCode.ERROR.getCode()).withMessage("用户不存在").build();
 	}
 }
