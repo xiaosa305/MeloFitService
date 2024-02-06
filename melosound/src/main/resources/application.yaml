@@ -17,20 +17,23 @@ spring:
       date-format: yyyy-MM-dd HH:mm:ss
       time-zone: GMT+8
    datasource:
-      url: jdbc:mysql://192.168.174.129:3306/melofitting?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
-      #username: root
-      #password: a465492278@Mysql
-      username: xiaosa
-      password: 123456
+      #url: jdbc:mysql://192.168.174.129:3306/melofitting?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+      url: jdbc:mysql://124.220.175.224:3306/melosound?useSSL=false&characterEncoding=UTF-8&serverTimezone=UTC
+      username: melosound
+      password: Mr8HEEBPndmYNNcN
+      #username: xiaosa
+      #password: 123456
       driverClassName: com.mysql.cj.jdbc.Driver
    rabbitmq:
-      host: 192.168.174.129
-      #127.0.0.1
-      port: 5672
+      host: 124.220.175.224
+      port: 55672
+      #host: 192.168.174.129
+      #port: 5672
       #注意：guest用户只能链接本地服务器 比如localhost  不可以连接远程服务器
       username: xiaosa
-      password: 123456
-      virtual-host: /
+      password: a465492278
+      virtual-host: /vhost_websocket
+      #virtual-host: /
       publisher-returns: true
       listener:
       # guest
@@ -49,11 +52,12 @@ spring:
                #重试间隔 3s
                max-interval: 3000
    redis:
-      #host: 127.0.0.1
-      host: 192.168.174.129
-      port: 6379
-      #password: a465492278
-      password: 123456
+      host: 124.220.175.224
+      port: 37690
+      password: bt_redis
+      #host: 192.168.174.129
+      #port: 6379
+      #password: 123456
 mybatis:
   mapper-locations: classpath:mappers/*.xml # 映射文件位置
   type-aliases-package: com.melosound.fit.domain.po # 实体类存放位置

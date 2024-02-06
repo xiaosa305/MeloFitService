@@ -2,11 +2,13 @@ package com.melosound.fit.controller;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,22 +68,6 @@ public class PublicController {
 		logger.info("checkServerStatus API:");
         return new ApiResponseBuilder().withCode(ResponseCode.SUCCESS.getCode()).withMessage("Server is running and connected successfully.").build();
     }
-	
-	@PostMapping("test")
-	public ApiResponse test(HttpServletRequest request) {
-		logger.info("test API: ");
-		Ret ret = userService.findUserByUsername("xiaosa");
-		MeloUser operator = (MeloUser) ret.getData();
-		UserInfoRequest fitter = new UserInfoRequest();
-		fitter.setUsername("fitter1");
-		fitter.setPassword("123456");
-		ret =  userService.registFitter(fitter, operator.getId());
-		if(ret.getResult() == ResultType.Success) {
-			return new ApiResponseBuilder().withCode(ResponseCode.SUCCESS.getCode()).withData(ret.getData()).build();
-		}
-		return new ApiResponseBuilder().withCode(ResponseCode.ERROR.getCode()).withMessage("注册失败").build();
-	}
-	
 	
 
 	@PostMapping("login")
